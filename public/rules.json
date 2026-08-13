@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "origin", "operation": "remove" },
+        { "header": "referer", "operation": "remove" }
+      ]
+    },
+    "condition": {
+      "urlFilter": "||api.groq.com",
+      "resourceTypes": [
+        "xmlhttprequest",
+        "other",
+        "main_frame",
+        "sub_frame",
+        "script",
+        "image",
+        "font",
+        "media",
+        "websocket",
+        "csp_report",
+        "ping",
+        "stylesheet"
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "origin", "operation": "remove" },
+        { "header": "referer", "operation": "remove" }
+      ]
+    },
+    "condition": {
+      "urlFilter": "||generativelanguage.googleapis.com",
+      "resourceTypes": [
+        "xmlhttprequest",
+        "other",
+        "main_frame",
+        "sub_frame",
+        "script",
+        "image",
+        "font",
+        "media",
+        "websocket",
+        "csp_report",
+        "ping",
+        "stylesheet"
+      ]
+    }
+  }
+]
