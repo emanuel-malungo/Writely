@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, EXTENSION_NAME, EXTENSION_VERSION, STORAGE_KEYS } from '../shared/constants';
+import { DEFAULT_SETTINGS, EXTENSION_NAME, EXTENSION_VERSION, GROQ_MODELS, STORAGE_KEYS } from '../shared/constants';
 import { ActiveChatInfo, ExtensionMessage, ExtensionSettings, ServiceWorkerStatus, TypingState } from '../shared/types';
 import { generateAICompletion } from './aiService';
 
@@ -103,6 +103,13 @@ async function getSettings(): Promise<ExtensionSettings> {
   if (!stored.groqModel) stored.groqModel = stored.model || DEFAULT_SETTINGS.groqModel;
   if (!stored.geminiApiKey) stored.geminiApiKey = DEFAULT_SETTINGS.geminiApiKey;
   if (!stored.geminiModel) stored.geminiModel = DEFAULT_SETTINGS.geminiModel;
+
+  // Migration: reset deprecated/deprecated Groq models (e.g. llama-3.3-70b-versatile)
+  const validGroqModels = GROQ_MODELS.map((m) => m.id);
+  if (!validGroqModels.includes(stored.groqModel || '')) {
+    stored.groqModel = DEFAULT_SETTINGS.groqModel;
+    stored.model = DEFAULT_SETTINGS.groqModel;
+  }
 
   return stored;
 }
