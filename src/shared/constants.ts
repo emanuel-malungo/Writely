@@ -8,10 +8,8 @@ export const STORAGE_KEYS = {
   ANALYTICS: 'writely_analytics',
 } as const;
 
-// Read API Keys securely from environment variables
-const ENV_GROQ_KEY = import.meta.env?.VITE_GROQ_API_KEY || '';
+// Read non-secret defaults from environment variables (API keys are NEVER embedded in the build)
 const ENV_GROQ_MODEL = import.meta.env?.VITE_GROQ_DEFAULT_MODEL || 'openai/gpt-oss-20b';
-const ENV_GEMINI_KEY = import.meta.env?.VITE_GEMINI_API_KEY || '';
 const ENV_GEMINI_MODEL = import.meta.env?.VITE_GEMINI_DEFAULT_MODEL || 'gemini-3.6-flash';
 const ENV_DEFAULT_PROVIDER = import.meta.env?.VITE_DEFAULT_PROVIDER || 'groq';
 
@@ -38,12 +36,12 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   activeTone: 'professional',
   autoSuggest: true,
   activeProvider: ENV_DEFAULT_PROVIDER as 'groq' | 'gemini',
-  groqApiKey: ENV_GROQ_KEY,
+  groqApiKey: '',
   groqModel: ENV_GROQ_MODEL,
-  geminiApiKey: ENV_GEMINI_KEY,
+  geminiApiKey: '',
   geminiModel: ENV_GEMINI_MODEL,
   // Legacy compatibility — points to active provider
-  apiKey: ENV_DEFAULT_PROVIDER === 'gemini' ? ENV_GEMINI_KEY : ENV_GROQ_KEY,
+  apiKey: '',
   model: ENV_DEFAULT_PROVIDER === 'gemini' ? ENV_GEMINI_MODEL : ENV_GROQ_MODEL,
   theme: 'dark',
   customPrompts: [
