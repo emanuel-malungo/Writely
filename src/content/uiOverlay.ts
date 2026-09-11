@@ -6,6 +6,7 @@ export class WritelyUIOverlay {
   private observer: WhatsAppObserver;
   private settings: ExtensionSettings;
   private toolbarContainer: HTMLDivElement | null = null;
+  private toolbarFooterEl: HTMLElement | null = null;
   private statusBadge: HTMLDivElement | null = null;
   private toastNotificationEl: HTMLDivElement | null = null;
 
@@ -106,87 +107,94 @@ export class WritelyUIOverlay {
   }
 
   /**
-   * EPIC 04 & EPIC 12 — Render AI Action Toolbar attached directly to WhatsApp message editor
+   * EPIC 04 & EPIC 12 — Render AI Action Toolbar floating above WhatsApp message editor.
+   * Positioned absolutely so it never interferes with the WhatsApp layout — the text box
+   * and the send button remain fully visible and clickable.
    */
   public renderToolbar() {
     const editorEl = this.observer.getEditorElement();
-    if (!editorEl || !this.settings.enabled) {
-      if (this.toolbarContainer) {
-        this.toolbarContainer.style.display = 'none';
-      }
+    const parentFooter = editorEl
+      ? (editorEl.closest('footer') as HTMLElement | null) || editorEl.parentElement
+      : null;
+
+    if (!parentFooter || !this.settings.enabled) {
+      this.removeToolbar();
       return;
     }
 
-    const parentFooter = editorEl.closest('footer') || editorEl.parentElement;
-    if (!parentFooter) return;
+    // Anchor the toolbar to the compose footer without altering its internal layout.
+    parentFooter.style.position = 'relative';
 
-    if (!this.toolbarContainer) {
+    if (!this.toolbarContainer || !this.toolbarContainer.isConnected) {
       this.toolbarContainer = document.createElement('div');
       this.toolbarContainer.id = 'writely-editor-toolbar';
-      parentFooter.prepend(this.toolbarContainer);
-    } else if (this.toolbarContainer.parentElement !== parentFooter) {
-      parentFooter.prepend(this.toolbarContainer);
+      parentFooter.appendChild(this.toolbarContainer);
     }
+    this.toolbarFooterEl = parentFooter;
 
     const editorText = this.observer.getEditorText();
     const hasText = editorText.length > 0;
+    const visible = hasText || this.statusState !== 'IDLE';
 
-    this.toolbarContainer.style.display = 'flex';
     this.toolbarContainer.style.cssText = `
+      position: absolute;
+      right: 12px;
+      bottom: calc(100% + 8px);
+      z-index: 99999;
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
-      padding: 6px 14px;
-      background: #1E293B;
-      border-bottom: 1px solid #334155;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: calc(100vw - 24px);
+      padding: 6px 10px;
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 12px;
-      color: #F8FAFC;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
+      color: #EDEDED;
       user-select: none;
-      z-index: 999;
-      transition: opacity 0.2s ease;
-      opacity: ${hasText || this.statusState !== 'IDLE' ? '1' : '0.85'};
+      opacity: ${visible ? '1' : '0'};
+      pointer-events: ${visible ? 'auto' : 'none'};
+      transform: translateY(${visible ? '0' : '4px'});
+      transition: opacity 0.18s ease, transform 0.18s ease;
     `;
 
     // Build button label according to EPIC 04 & EPIC 08 states
     let buttonLabel = '✨ Melhorar com IA';
-    let buttonBg = 'linear-gradient(135deg, #4F46E5 0%, #0D9488 100%)';
     let buttonDisabled = !hasText || this.statusState === 'PROCESSING';
 
     if (this.statusState === 'PROCESSING') {
       buttonLabel = '⏳ Melhorando...';
-      buttonBg = '#475569';
     } else if (this.statusState === 'SUCCESS') {
       buttonLabel = '✓ Melhorado';
-      buttonBg = '#10B981';
       buttonDisabled = false;
     } else if (this.statusState === 'ERROR') {
       buttonLabel = '⚠️ Tentar novamente';
-      buttonBg = '#EF4444';
       buttonDisabled = false;
     }
 
     this.toolbarContainer.innerHTML = `
-      <div style="display:flex; align-items:center; gap:6px; font-weight:700; color:#818CF8;">
+      <div style="display:flex; align-items:center; gap:6px; font-weight:700; color:#FFFFFF; white-space:nowrap;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
         <span>Writely</span>
       </div>
 
-      <div style="height:14px; width:1px; background:#475569; margin:0 4px;"></div>
+      <div style="height:14px; width:1px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
 
       <button id="writely-btn-generate" ${buttonDisabled ? 'disabled' : ''} style="
         display: flex;
         align-items: center;
         gap: 6px;
-        background: ${buttonBg};
-        color: #FFFFFF;
+        background: #EDEDED;
+        color: #000000;
         border: none;
         padding: 5px 12px;
         border-radius: 6px;
         font-weight: 600;
         font-size: 11px;
+        font-family: inherit;
         cursor: ${buttonDisabled ? 'not-allowed' : 'pointer'};
         opacity: ${buttonDisabled && this.statusState === 'IDLE' ? '0.5' : '1'};
         transition: all 0.2s ease;
@@ -194,19 +202,22 @@ export class WritelyUIOverlay {
         <span>${buttonLabel}</span>
       </button>
 
-      <span style="font-size:10px; color:#94A3B8; margin-left:4px;">(Alt+W)</span>
+      <span style="font-size:10px; color:#888888; margin-left:2px; white-space:nowrap;">(Alt+W)</span>
 
       <div style="display:flex; align-items:center; gap:4px; margin-left:auto;">
         ${TONE_OPTIONS.map(
           (t) => `
           <button data-tone="${t.id}" class="writely-tone-btn" style="
-            background: ${t.id === this.settings.activeTone ? 'rgba(99, 102, 241, 0.3)' : 'transparent'};
-            border: 1px solid ${t.id === this.settings.activeTone ? '#6366F1' : 'transparent'};
-            color: ${t.id === this.settings.activeTone ? '#A5B4FC' : '#94A3B8'};
+            background: ${t.id === this.settings.activeTone ? '#EDEDED' : 'transparent'};
+            border: 1px solid ${t.id === this.settings.activeTone ? '#EDEDED' : 'rgba(255,255,255,0.2)'};
+            color: ${t.id === this.settings.activeTone ? '#000000' : '#a0a0a0'};
             padding: 3px 8px;
-            border-radius: 4px;
+            border-radius: 5px;
             font-size: 11px;
+            font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
+            transition: all 0.15s ease;
           ">${t.label}</button>
         `
         ).join('')}
@@ -377,6 +388,10 @@ export class WritelyUIOverlay {
     if (this.toolbarContainer) {
       this.toolbarContainer.remove();
       this.toolbarContainer = null;
+    }
+    if (this.toolbarFooterEl) {
+      this.toolbarFooterEl.style.position = '';
+      this.toolbarFooterEl = null;
     }
   }
 }

@@ -192,12 +192,12 @@ export default function PopupApp() {
       <header className="header">
         <div className="brand">
           <div className="logo-badge">
-            <Sparkles size={16} />
+            <Sparkles size={14} />
           </div>
-          <h1 className="title">✨ Writely AI</h1>
+          <h1 className="title">Writely<span className="title-tag">AI</span></h1>
         </div>
-        <button className="icon-button" onClick={openOptions} title="Abrir Opções Avançadas">
-          <Settings size={16} />
+        <button className="icon-button" onClick={openOptions} title="Abrir Opções Avançadas" aria-label="Abrir Opções Avançadas">
+          <Settings size={15} />
         </button>
       </header>
 
@@ -229,22 +229,6 @@ export default function PopupApp() {
               className={`provider-btn ${activeProvider === p.id ? 'active' : ''}`}
               onClick={() => handleProviderChange(p.id as AIProvider)}
               title={p.description}
-              style={{
-                flex: 1,
-                padding: '6px 10px',
-                border: activeProvider === p.id ? '1px solid #6366F1' : '1px solid #334155',
-                borderRadius: '6px',
-                background: activeProvider === p.id ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
-                color: activeProvider === p.id ? '#A5B4FC' : '#94A3B8',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                transition: 'all 0.2s ease',
-              }}
             >
               <span>{p.icon}</span>
               <span>{p.name}</span>
@@ -264,7 +248,7 @@ export default function PopupApp() {
         >
           {activeModels.map((m) => (
             <option key={m.id} value={m.id}>
-              {m.name} — {m.description}
+              {m.name}
             </option>
           ))}
         </select>
@@ -320,7 +304,13 @@ export default function PopupApp() {
         <span className="field-label">Atalho Teclado</span>
         <div className="shortcut-badge">
           <Command size={12} />
-          <span>Alt + W ou Ctrl + Shift + G</span>
+          <span className="kbd-item">
+            <kbd>Alt</kbd><span>+</span><kbd>W</kbd>
+          </span>
+          <span className="kbd-sep">ou</span>
+          <span className="kbd-item">
+            <kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>G</kbd>
+          </span>
         </div>
       </div>
 
