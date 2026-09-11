@@ -10,15 +10,16 @@ export const STORAGE_KEYS = {
 
 // Read API Keys securely from environment variables
 const ENV_GROQ_KEY = import.meta.env?.VITE_GROQ_API_KEY || '';
-const ENV_GROQ_MODEL = import.meta.env?.VITE_GROQ_DEFAULT_MODEL || 'llama-3.3-70b-versatile';
+const ENV_GROQ_MODEL = import.meta.env?.VITE_GROQ_DEFAULT_MODEL || 'openai/gpt-oss-20b';
 const ENV_GEMINI_KEY = import.meta.env?.VITE_GEMINI_API_KEY || '';
 const ENV_GEMINI_MODEL = import.meta.env?.VITE_GEMINI_DEFAULT_MODEL || 'gemini-3.6-flash';
 const ENV_DEFAULT_PROVIDER = import.meta.env?.VITE_DEFAULT_PROVIDER || 'groq';
 
 export const GROQ_MODELS = [
-  { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B (Recomendado)', description: 'Alta precisão e velocidade' },
-  { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B Instant', description: 'Resposta ultrarrápida' },
-  { id: 'openai/gpt-oss-20b', name: 'GPT-OSS 20B', description: 'Equilibrado e eficiente' },
+  { id: 'openai/gpt-oss-20b', name: 'GPT-OSS 20B (Recomendado)', description: 'Rápido e equilibrado' },
+  { id: 'openai/gpt-oss-120b', name: 'GPT-OSS 120B', description: 'Alta qualidade de raciocínio' },
+  { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B', description: 'Eficiente e multimodal' },
+  { id: 'groq/compound-mini', name: 'Compound Mini', description: 'Roteamento inteligente' },
 ];
 
 export const GEMINI_MODELS = [

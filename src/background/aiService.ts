@@ -54,7 +54,7 @@ async function callGroq(params: {
         { role: 'system', content: systemPrompt },
         { role: 'user', content: `Mensagem para melhorar:\n${promptText}` },
       ],
-      model: model || 'llama-3.3-70b-versatile',
+      model: model || 'openai/gpt-oss-20b',
       temperature: 0.4,
       max_completion_tokens: 1024,
     }),

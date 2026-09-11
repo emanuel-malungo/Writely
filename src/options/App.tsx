@@ -196,7 +196,7 @@ export default function OptionsApp() {
                   <Zap size={20} className="text-indigo" />
                   <h3>Groq SDK Engine</h3>
                 </div>
-                <p>Modelo configurado: {settings.model || 'llama-3.3-70b-versatile'}</p>
+                <p>Modelo configurado: {settings.model || 'openai/gpt-oss-20b'}</p>
                 <div className="badge-pill tone">Groq Cloud OK</div>
               </div>
             </div>
@@ -280,7 +280,7 @@ export default function OptionsApp() {
             <section className="section">
               <label className="input-label">Modelo Groq Ativo</label>
               <select
-                className="input-field"
+                className="select-field"
                 value={settings.model}
                 onChange={(e) => setSettings({ ...settings, model: e.target.value })}
               >
@@ -319,10 +319,10 @@ export default function OptionsApp() {
                 </button>
                 {testError && <div className="alert alert-error">{testError}</div>}
                 {testResult && (
-                  <div className="prompt-item" style={{ background: 'rgba(16, 185, 129, 0.1)', borderColor: '#10B981' }}>
+                  <div className="prompt-item test-result">
                     <div>
                       <strong>Resultado Gerado:</strong>
-                      <p style={{ marginTop: '4px', color: '#F8FAFC' }}>{testResult}</p>
+                      <p style={{ marginTop: '4px' }}>{testResult}</p>
                     </div>
                   </div>
                 )}

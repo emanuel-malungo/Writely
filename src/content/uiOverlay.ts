@@ -74,31 +74,31 @@ export class WritelyUIOverlay {
 
     this.statusBadge.style.cssText = `
       position: fixed;
-      bottom: 16px;
-      right: 20px;
+      top: 70px;
+      right: 12px;
       z-index: 99999;
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 14px;
+      padding: 7px 12px;
       border-radius: 9999px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       font-size: 12px;
       font-weight: 600;
-      color: #FFFFFF;
-      background: ${enabled ? 'linear-gradient(135deg, #4F46E5 0%, #0D9488 100%)' : '#475569'};
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #EDEDED;
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       cursor: pointer;
       user-select: none;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
     `;
 
     this.statusBadge.innerHTML = `
-      <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:${enabled ? '#34D399' : '#94A3B8'}; box-shadow: 0 0 8px ${enabled ? '#34D399' : 'transparent'};"></span>
+      <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background-color:${enabled ? '#FFFFFF' : '#4a4a4a'}; box-shadow: ${enabled ? '0 0 8px rgba(255,255,255,0.6)' : 'none'};"></span>
       <span>${EXTENSION_NAME} ${enabled ? 'Ativo' : 'Pausado'}</span>
-      ${enabled && toneObj ? `<span style="opacity:0.8; font-size:11px;">• ${toneObj.label}</span>` : ''}
-      ${enabled && chatTitle ? `<span style="opacity:0.75; font-size:10px; background:rgba(0,0,0,0.25); padding:2px 6px; border-radius:4px;">💬 ${chatTitle}</span>` : ''}
+      ${enabled && toneObj ? `<span style="opacity:0.75; font-size:11px; color:#a0a0a0;">• ${toneObj.label}</span>` : ''}
+      ${enabled && chatTitle ? `<span style="opacity:0.85; font-size:10px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.15); padding:2px 6px; border-radius:5px;">${chatTitle}</span>` : ''}
     `;
 
     this.statusBadge.onclick = () => {
@@ -138,14 +138,15 @@ export class WritelyUIOverlay {
 
     this.toolbarContainer.style.cssText = `
       position: absolute;
-      right: 12px;
+      left: 50%;
       bottom: calc(100% + 8px);
       z-index: 99999;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 8px;
-      max-width: calc(100vw - 24px);
+      max-width: calc(100% - 24px);
       padding: 6px 10px;
       background: #000000;
       border: 1px solid rgba(255, 255, 255, 0.25);
@@ -157,7 +158,7 @@ export class WritelyUIOverlay {
       user-select: none;
       opacity: ${visible ? '1' : '0'};
       pointer-events: ${visible ? 'auto' : 'none'};
-      transform: translateY(${visible ? '0' : '4px'});
+      transform: translate(-50%, ${visible ? '0' : '4px'});
       transition: opacity 0.18s ease, transform 0.18s ease;
     `;
 
