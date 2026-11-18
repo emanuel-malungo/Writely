@@ -67,6 +67,10 @@ async function callGroq(params: {
   if (!response.ok) {
     const errorBody = await response.text();
     console.error('[Writely AI Groq] Erro:', errorBody);
+    if (response.status === 404 && model !== 'openai/gpt-oss-20b') {
+      console.warn('[Writely AI Groq] Modelo indisponível na conta (404). Alternando para openai/gpt-oss-20b...');
+      return callGroq({ ...params, model: 'openai/gpt-oss-20b' });
+    }
     if (response.status === 403) throw new Error(`Acesso bloqueado pela API Groq (403). ${errorBody}`);
     if (response.status === 401) throw new Error('Chave de API Groq inválida (401).');
     if (response.status === 429) throw new Error('Limite de requisições Groq excedido (429). Aguarde.');
@@ -102,7 +106,7 @@ async function callGemini(params: {
       'x-goog-api-key': apiKey.trim(),
     },
     body: JSON.stringify({
-      model: model || 'gemini-3.6-flash',
+      model: model || 'gemini-3.5-flash-lite',
       system_instruction: systemPrompt,
       input: `Mensagem para melhorar:\n${promptText}`,
       generation_config: {
@@ -119,6 +123,10 @@ async function callGemini(params: {
   if (!response.ok) {
     const errorBody = await response.text();
     console.error('[Writely AI Gemini] Erro:', errorBody);
+    if ((response.status === 503 || response.status === 404) && model !== 'gemini-3.5-flash-lite') {
+      console.warn('[Writely AI Gemini] Modelo sobrecarregado (503) ou indisponível. Alternando para gemini-3.5-flash-lite...');
+      return callGemini({ ...params, model: 'gemini-3.5-flash-lite' });
+    }
     if (response.status === 403) throw new Error(`Acesso bloqueado pela API Gemini (403). ${errorBody}`);
     if (response.status === 400) throw new Error(`Requisição inválida para Gemini (400). ${errorBody}`);
     if (response.status === 401) throw new Error('Chave de API Gemini inválida (401).');

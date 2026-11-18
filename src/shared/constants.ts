@@ -8,22 +8,23 @@ export const STORAGE_KEYS = {
   ANALYTICS: 'writely_analytics',
 } as const;
 
-// Read non-secret defaults from environment variables (API keys are NEVER embedded in the build)
+// Read configuration and defaults from environment variables
+const ENV_GROQ_KEY = import.meta.env?.VITE_GROQ_API_KEY || '';
 const ENV_GROQ_MODEL = import.meta.env?.VITE_GROQ_DEFAULT_MODEL || 'openai/gpt-oss-20b';
-const ENV_GEMINI_MODEL = import.meta.env?.VITE_GEMINI_DEFAULT_MODEL || 'gemini-3.6-flash';
+const ENV_GEMINI_KEY = import.meta.env?.VITE_GEMINI_API_KEY || '';
+const ENV_GEMINI_MODEL = import.meta.env?.VITE_GEMINI_DEFAULT_MODEL || 'gemini-3.5-flash-lite';
 const ENV_DEFAULT_PROVIDER = import.meta.env?.VITE_DEFAULT_PROVIDER || 'groq';
 
 export const GROQ_MODELS = [
-  { id: 'openai/gpt-oss-20b', name: 'GPT-OSS 20B (Recomendado)', description: 'Rápido e equilibrado' },
-  { id: 'openai/gpt-oss-120b', name: 'GPT-OSS 120B', description: 'Alta qualidade de raciocínio' },
+  { id: 'openai/gpt-oss-20b', name: 'GPT-OSS 20B (Recomendado)', description: 'Rápido, equilibrado e disponível' },
+  { id: 'openai/gpt-oss-120b', name: 'GPT-OSS 120B', description: 'Alta precisão e raciocínio profundo' },
   { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B', description: 'Eficiente e multimodal' },
-  { id: 'groq/compound-mini', name: 'Compound Mini', description: 'Roteamento inteligente' },
 ];
 
 export const GEMINI_MODELS = [
-  { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash (Recomendado)', description: 'Fronteira com custo baixo' },
-  { id: 'gemini-3.5-flash-lite', name: 'Gemini 3.5 Flash-Lite', description: 'Otimizado para alta velocidade' },
-  { id: 'gemini-3.1-pro', name: 'Gemini 3.1 Pro', description: 'Máxima inteligência' },
+  { id: 'gemini-3.5-flash-lite', name: 'Gemini 3.5 Flash-Lite (Recomendado)', description: 'Ultrarrápido e alta disponibilidade' },
+  { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash', description: 'Modelo mais recente do Google' },
+  { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash', description: 'Fronteira com custo baixo' },
 ];
 
 export const AI_PROVIDERS = [
@@ -36,12 +37,12 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   activeTone: 'professional',
   autoSuggest: true,
   activeProvider: ENV_DEFAULT_PROVIDER as 'groq' | 'gemini',
-  groqApiKey: '',
+  groqApiKey: ENV_GROQ_KEY,
   groqModel: ENV_GROQ_MODEL,
-  geminiApiKey: '',
+  geminiApiKey: ENV_GEMINI_KEY,
   geminiModel: ENV_GEMINI_MODEL,
   // Legacy compatibility — points to active provider
-  apiKey: '',
+  apiKey: ENV_DEFAULT_PROVIDER === 'gemini' ? ENV_GEMINI_KEY : ENV_GROQ_KEY,
   model: ENV_DEFAULT_PROVIDER === 'gemini' ? ENV_GEMINI_MODEL : ENV_GROQ_MODEL,
   theme: 'dark',
   customPrompts: [

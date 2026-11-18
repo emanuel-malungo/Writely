@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, EXTENSION_NAME, EXTENSION_VERSION, GROQ_MODELS, STORAGE_KEYS } from '../shared/constants';
+import { DEFAULT_SETTINGS, EXTENSION_NAME, EXTENSION_VERSION, GROQ_MODELS, GEMINI_MODELS, STORAGE_KEYS } from '../shared/constants';
 import { ActiveChatInfo, ExtensionMessage, ExtensionSettings, ServiceWorkerStatus, TypingState } from '../shared/types';
 import { generateAICompletion } from './aiService';
 
@@ -95,20 +95,41 @@ async function updateBadge(enabled: boolean) {
 // Get helper for current settings
 async function getSettings(): Promise<ExtensionSettings> {
   const data = await chrome.storage.local.get(STORAGE_KEYS.SETTINGS);
-  const stored = (data[STORAGE_KEYS.SETTINGS] as ExtensionSettings) || DEFAULT_SETTINGS;
+  const stored = (data[STORAGE_KEYS.SETTINGS] as ExtensionSettings) || { ...DEFAULT_SETTINGS };
+
+  let isDirty = false;
 
   // Ensure provider and keys are populated
-  if (!stored.activeProvider) stored.activeProvider = DEFAULT_SETTINGS.activeProvider;
-  if (!stored.groqApiKey) stored.groqApiKey = stored.apiKey || DEFAULT_SETTINGS.groqApiKey;
-  if (!stored.groqModel) stored.groqModel = stored.model || DEFAULT_SETTINGS.groqModel;
-  if (!stored.geminiApiKey) stored.geminiApiKey = DEFAULT_SETTINGS.geminiApiKey;
-  if (!stored.geminiModel) stored.geminiModel = DEFAULT_SETTINGS.geminiModel;
+  if (!stored.activeProvider) {
+    stored.activeProvider = DEFAULT_SETTINGS.activeProvider;
+    isDirty = true;
+  }
+  if (!stored.groqApiKey) {
+    stored.groqApiKey = stored.apiKey || DEFAULT_SETTINGS.groqApiKey;
+    isDirty = true;
+  }
+  if (!stored.geminiApiKey) {
+    stored.geminiApiKey = DEFAULT_SETTINGS.geminiApiKey;
+    isDirty = true;
+  }
 
-  // Migration: reset deprecated/deprecated Groq models (e.g. llama-3.3-70b-versatile)
+  // Sanitize Groq models (reset deprecated/non-existent models like llama-3.3-70b-versatile or compound-mini)
   const validGroqModels = GROQ_MODELS.map((m) => m.id);
   if (!validGroqModels.includes(stored.groqModel || '')) {
     stored.groqModel = DEFAULT_SETTINGS.groqModel;
     stored.model = DEFAULT_SETTINGS.groqModel;
+    isDirty = true;
+  }
+
+  // Sanitize Gemini models (reset deprecated/overloaded models like 3.6-flash or 3.1-pro to 3.5-flash-lite)
+  const validGeminiModels = GEMINI_MODELS.map((m) => m.id);
+  if (!validGeminiModels.includes(stored.geminiModel || '') || stored.geminiModel === 'gemini-3.6-flash') {
+    stored.geminiModel = DEFAULT_SETTINGS.geminiModel;
+    isDirty = true;
+  }
+
+  if (isDirty) {
+    await chrome.storage.local.set({ [STORAGE_KEYS.SETTINGS]: stored });
   }
 
   return stored;

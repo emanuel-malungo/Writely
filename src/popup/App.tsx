@@ -59,7 +59,7 @@ export default function PopupApp() {
             groqApiKey: '',
             groqModel: 'openai/gpt-oss-20b',
             geminiApiKey: '',
-            geminiModel: 'gemini-3.6-flash',
+            geminiModel: 'gemini-3.5-flash-lite',
             apiKey: '',
             model: 'openai/gpt-oss-20b',
             theme: 'dark',
